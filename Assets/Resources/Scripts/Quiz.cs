@@ -31,11 +31,22 @@ public class Quiz : MonoBehaviour
     [SerializeField] TextMeshProUGUI scoreText;
     private ScoreKeeper scoreHandler;
 
+    [Header("ProgressBar")]
+    [SerializeField] private Slider progressBar;
+
+    public bool isComplete;
+
     // Start is called before the first frame update
     void Start()
     {
+        //Gets the scripts that handle the different systems
         timerHandler = FindObjectOfType<Timer>();
         scoreHandler = FindObjectOfType<ScoreKeeper>();
+
+        //Configures the progress bar of the game
+        progressBar.maxValue = questions.Count;
+        //Sets the initial value
+        progressBar.value = 0;
     }
 
     void Update()
@@ -98,6 +109,10 @@ public class Quiz : MonoBehaviour
         //And the timer should stop
         timerHandler.CancelTimer();
         scoreText.text = "Score: " + scoreHandler.CalculateScore() + "%";
+
+        //Updates the value indicating that the game has ended
+        if (progressBar.value == progressBar.maxValue)
+            isComplete = true;
     }
 
     //Swaps the current answear to the next one
@@ -111,6 +126,8 @@ public class Quiz : MonoBehaviour
             SetDefaultButtonsSprites();
             GetRandomQuestion();
             DisplayQuestionInfos();
+            //Increases the progressbar counter
+            progressBar.value++;
             scoreHandler.IncrementQuestionsSeen();
         }        
     }

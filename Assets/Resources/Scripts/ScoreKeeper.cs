@@ -42,6 +42,8 @@ public class ScoreKeeper : MonoBehaviour
         questionsSeen++;
     }
 
+    //Calculates the percentage amount of questions that were
+    //answered correctly
     public int CalculateScore()
     {
         int percentageCorrectAnswears;
