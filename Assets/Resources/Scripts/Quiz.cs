@@ -27,10 +27,15 @@ public class Quiz : MonoBehaviour
     [SerializeField] private Image timerImage;
     private Timer timerHandler;
 
+    [Header("Scoring")]
+    [SerializeField] TextMeshProUGUI scoreText;
+    private ScoreKeeper scoreHandler;
+
     // Start is called before the first frame update
     void Start()
     {
         timerHandler = FindObjectOfType<Timer>();
+        scoreHandler = FindObjectOfType<ScoreKeeper>();
     }
 
     void Update()
@@ -65,6 +70,7 @@ public class Quiz : MonoBehaviour
             //Alter the source image of this button to the one the correct
             //answear
             buttonImage.sprite = correctAnswerSprite;
+            scoreHandler.IncrementCorrectAnswears();
         }
         else
         {
@@ -91,6 +97,7 @@ public class Quiz : MonoBehaviour
         SetButtonState(false);
         //And the timer should stop
         timerHandler.CancelTimer();
+        scoreText.text = "Score: " + scoreHandler.CalculateScore() + "%";
     }
 
     //Swaps the current answear to the next one
@@ -104,6 +111,7 @@ public class Quiz : MonoBehaviour
             SetDefaultButtonsSprites();
             GetRandomQuestion();
             DisplayQuestionInfos();
+            scoreHandler.IncrementQuestionsSeen();
         }        
     }
 

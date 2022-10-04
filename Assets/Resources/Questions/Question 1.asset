@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Question 1
   m_EditorClassIdentifier: 
   question: What is the correct syntax for creating an integer variable with a initial
-    value of 2?
+    value of 12?
   answears:
   - int num = 12;
   - Int num = "12"
