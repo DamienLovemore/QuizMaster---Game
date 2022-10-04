@@ -11,7 +11,8 @@ public class Quiz : MonoBehaviour
     //variables.
     [Header("Questions")]
     [SerializeField] private TextMeshProUGUI questionText;
-    [SerializeField] private QuestionSO question;
+    [SerializeField] private List<QuestionSO> questions = new List<QuestionSO>();
+    private QuestionSO currentQuestion;
 
     [Header("Answears")]
     [SerializeField] private GameObject[] answearButtons;
@@ -30,7 +31,6 @@ public class Quiz : MonoBehaviour
     void Start()
     {
         timerHandler = FindObjectOfType<Timer>();
-        GetNextQuestion();   
     }
 
     void Update()
@@ -57,7 +57,7 @@ public class Quiz : MonoBehaviour
     private void DisplayAnswear(int index)
     {
         //Correct Answear
-        if (index == question.GetCorrectAnswearIndex())
+        if (index == currentQuestion.GetCorrectAnswearIndex())
         {
             questionText.text = "Correct!";
             //Acces the component that holds the image of this button
@@ -69,10 +69,10 @@ public class Quiz : MonoBehaviour
         else
         {
             //Gets the correct answear index for this question
-            correctAnswearIndex = question.GetCorrectAnswearIndex();
+            correctAnswearIndex = currentQuestion.GetCorrectAnswearIndex();
 
             //Gets the correct answear text
-            string answear = question.GetAnswear(correctAnswearIndex);
+            string answear = currentQuestion.GetAnswear(correctAnswearIndex);
             questionText.text = $"Sorry,the correct answear was:\n {answear}";
             Image buttonImage = answearButtons[correctAnswearIndex].GetComponent<Image>();
             //Alter the source image of this button to the one the correct
@@ -96,9 +96,28 @@ public class Quiz : MonoBehaviour
     //Swaps the current answear to the next one
     private void GetNextQuestion()
     {
-        SetButtonState(true);
-        SetDefaultButtonsSprites();
-        DisplayQuestionInfos();
+        //Starts the next question only if there is at least one
+        //question reamining
+        if(questions.Count > 0)
+        {
+            SetButtonState(true);
+            SetDefaultButtonsSprites();
+            GetRandomQuestion();
+            DisplayQuestionInfos();
+        }        
+    }
+
+    //Gets a random question to be used for the next currentQuestion
+    private void GetRandomQuestion()
+    {
+        int randomIndex = Random.Range(0, questions.Count);
+        currentQuestion = questions[randomIndex];
+
+        //Checks before removing to avoid erros, as the questions is
+        //used by others scripts
+        if (questions.Contains(currentQuestion))
+            //Removes the question to avoid sorting the same question twice
+            questions.Remove(currentQuestion);
     }
 
     //Display the text of the current question, and its
@@ -106,14 +125,14 @@ public class Quiz : MonoBehaviour
     private void DisplayQuestionInfos()
     {
         //Set the text of this question in the UI
-        questionText.text = question.GetQuestionText();
+        questionText.text = currentQuestion.GetQuestionText();
 
         //Update the text of the answear buttons to be of the possible answear
         //for this QuestionSO
         for (int buttonIndex = 0; buttonIndex < answearButtons.Length; buttonIndex++)
         {
             TextMeshProUGUI buttonText = answearButtons[buttonIndex].GetComponentInChildren<TextMeshProUGUI>();
-            buttonText.text = question.GetAnswear(buttonIndex);
+            buttonText.text = currentQuestion.GetAnswear(buttonIndex);
         }
     }
 
