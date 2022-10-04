@@ -17,7 +17,7 @@ public class Quiz : MonoBehaviour
     [Header("Answears")]
     [SerializeField] private GameObject[] answearButtons;
     private int correctAnswearIndex;
-    private bool hasAnsweredEarly;
+    private bool hasAnsweredEarly = true;
 
     [Header("Buttons Color")]
     [SerializeField] private Sprite defaultAnswerSprite;
@@ -34,10 +34,10 @@ public class Quiz : MonoBehaviour
     [Header("ProgressBar")]
     [SerializeField] private Slider progressBar;
 
-    public bool isComplete;
+    private bool isComplete = false;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         //Gets the scripts that handle the different systems
         timerHandler = FindObjectOfType<Timer>();
@@ -55,6 +55,15 @@ public class Quiz : MonoBehaviour
         timerImage.fillAmount = timerHandler.GetTimerFillFraction();
         if(timerHandler.isTimeShowNextQuestion())
         {
+            //Updates the value indicating that the game has ended
+            if (progressBar.value == progressBar.maxValue)
+            {
+                isComplete = true;
+                //Avoid trying to get next question when it is
+                //already finished
+                return;
+            }
+                
             hasAnsweredEarly = false;
             GetNextQuestion();
             timerHandler.SetTimeShowNextQuestion(false);
@@ -108,11 +117,7 @@ public class Quiz : MonoBehaviour
         SetButtonState(false);
         //And the timer should stop
         timerHandler.CancelTimer();
-        scoreText.text = "Score: " + scoreHandler.CalculateScore() + "%";
-
-        //Updates the value indicating that the game has ended
-        if (progressBar.value == progressBar.maxValue)
-            isComplete = true;
+        scoreText.text = "Score: " + scoreHandler.CalculateScore() + "%";        
     }
 
     //Swaps the current answear to the next one
@@ -186,5 +191,15 @@ public class Quiz : MonoBehaviour
             //one
             buttonImage.sprite = defaultAnswerSprite;
         }
+    }
+
+    // Verifies if the game has been completed (answered all questions)
+    public bool isGameCompleted()
+    {
+        bool returnValue;
+
+        returnValue = isComplete;
+
+        return returnValue;
     }
 }
